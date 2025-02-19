@@ -67,10 +67,11 @@
                 }
                 rolls.sort(function (a, b) { return b - a });
                 let total = rolls[0] + rolls[1] + rolls[2]; // Sum the highest three rolls
+                let modifier = Math.floor((total - 10) / 2); // Calculate the ability modifier
                 rollsArray.push(total);
 
                 output += `<div class="ability">
-                    <strong>Roll ${i + 1}:</strong> ${total}
+                    <strong>Roll ${i + 1}:</strong> ${total} (Modifier: ${modifier >= 0 ? '+' : ''}${modifier})
                     <span>(Rolls: [${rolls.join(', ')}], Dropped: ${rolls[3]})</span>
                 </div>`;
             }
