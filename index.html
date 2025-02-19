@@ -86,7 +86,8 @@
             abilities.forEach(function (ability, index) {
                 dropdowns += `<div class="dropdown">
                     <label for="ability${index}">${ability}:</label>
-                    <select id="ability${index}">
+                    <select id="ability${index}" onchange="updateDropdowns()">
+                        <option value="">Select a roll</option>
                         ${rollsArray.map((roll, i) => `<option value="${roll}">Roll ${i + 1}: ${roll}</option>`).join('')}
                     </select>
                 </div>`;
@@ -94,6 +95,31 @@
 
             dropdowns += `<button onclick="assignAbilities()">Assign Scores</button>`;
             document.getElementById('assignments').innerHTML = dropdowns;
+        }
+
+        function updateDropdowns() {
+            const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+            let selectedRolls = [];
+
+            abilities.forEach(function (ability, index) {
+                const selectedRoll = document.getElementById(`ability${index}`).value;
+                if (selectedRoll) {
+                    selectedRolls.push(selectedRoll);
+                }
+            });
+
+            abilities.forEach(function (ability, index) {
+                const dropdown = document.getElementById(`ability${index}`);
+                const currentSelection = dropdown.value;
+                dropdown.innerHTML = `<option value="">Select a roll</option>` +
+                    rollsArray.map((roll, i) => {
+                        if (!selectedRolls.includes(roll.toString()) || roll.toString() === currentSelection) {
+                            return `<option value="${roll}">Roll ${i + 1}: ${roll}</option>`;
+                        }
+                        return '';
+                    }).join('');
+                dropdown.value = currentSelection;
+            });
         }
 
         function assignAbilities() {
