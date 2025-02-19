@@ -41,6 +41,10 @@
         .ability {
             margin: 10px 0;
         }
+
+        .dropdown {
+            margin: 10px 0;
+        }
     </style>
 </head>
 
@@ -48,24 +52,59 @@
     <h1>D&D 5e Ability Score Generator</h1>
     <button onclick="generateAbilities()">Roll Ability Scores</button>
     <div id="abilities"></div>
+    <div id="assignments"></div>
 
     <script>
         function generateAbilities() {
             const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
             let output = '';
+            let rollsArray = [];
 
-            abilities.forEach(function (ability) {
+            for (let i = 0; i < abilities.length; i++) {
                 let rolls = [];
-                for (let i = 0; i < 4; i++) {
+                for (let j = 0; j < 4; j++) {
                     rolls.push(rollDie(6));
                 }
                 rolls.sort(function (a, b) { return b - a });
                 let total = rolls[0] + rolls[1] + rolls[2]; // Sum the highest three rolls
-                let modifier = Math.floor((total - 10) / 2); // Calculate the ability modifier
+                rollsArray.push(total);
 
                 output += `<div class="ability">
-                    <strong>${ability}:</strong> ${total} (Modifier: ${modifier >= 0 ? '+' : ''}${modifier})
+                    <strong>Roll ${i + 1}:</strong> ${total}
                     <span>(Rolls: [${rolls.join(', ')}], Dropped: ${rolls[3]})</span>
+                </div>`;
+            }
+
+            document.getElementById('abilities').innerHTML = output;
+            generateDropdowns(abilities, rollsArray);
+        }
+
+        function generateDropdowns(abilities, rollsArray) {
+            let dropdowns = '';
+
+            abilities.forEach(function (ability, index) {
+                dropdowns += `<div class="dropdown">
+                    <label for="ability${index}">${ability}:</label>
+                    <select id="ability${index}">
+                        ${rollsArray.map((roll, i) => `<option value="${roll}">Roll ${i + 1}: ${roll}</option>`).join('')}
+                    </select>
+                </div>`;
+            });
+
+            dropdowns += `<button onclick="assignAbilities()">Assign Scores</button>`;
+            document.getElementById('assignments').innerHTML = dropdowns;
+        }
+
+        function assignAbilities() {
+            const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+            let output = '';
+
+            abilities.forEach(function (ability, index) {
+                const selectedRoll = document.getElementById(`ability${index}`).value;
+                let modifier = Math.floor((selectedRoll - 10) / 2); // Calculate the ability modifier
+
+                output += `<div class="ability">
+                    <strong>${ability}:</strong> ${selectedRoll} (Modifier: ${modifier >= 0 ? '+' : ''}${modifier})
                 </div>`;
             });
 
