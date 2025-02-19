@@ -55,10 +55,12 @@
     <div id="assignments"></div>
 
     <script>
+        let rollsArray = [];
+
         function generateAbilities() {
             const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
             let output = '';
-            let rollsArray = [];
+            rollsArray = [];
 
             for (let i = 0; i < abilities.length; i++) {
                 let rolls = [];
