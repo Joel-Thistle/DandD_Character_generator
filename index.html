@@ -44,6 +44,19 @@
         .dropdown {
             margin: 10px 0;
         }
+
+        .button-group {
+            margin-top: 20px;
+        }
+
+        .reset-button {
+            background-color: #666;
+            margin-left: 10px;
+        }
+
+        .reset-button:hover {
+            background-color: #555;
+        }
     </style>
 </head>
 
@@ -103,7 +116,11 @@
                 </div>`;
             });
 
-            dropdowns += `<button onclick="assignAbilities()">Assign Scores</button>`;
+            dropdowns += `
+                <div class="button-group">
+                    <button onclick="assignAbilities()">Assign Scores</button>
+                    <button onclick="resetAssignments()" class="reset-button">Reset Assignments</button>
+                </div>`;
             document.getElementById('assignments').innerHTML = dropdowns;
         }
 
@@ -155,6 +172,26 @@
 
         function rollDie(sides) {
             return Math.floor(Math.random() * sides) + 1;
+        }
+
+        function resetAssignments() {
+            // Reset all dropdowns to default value
+            ABILITIES.forEach((_, index) => {
+                const dropdown = document.getElementById(`ability${index}`);
+                dropdown.value = "";
+            });
+
+            // Update dropdowns to show all options again
+            updateDropdowns(null);
+
+            // Clear the assignments display
+            document.getElementById('abilities').innerHTML = rollsArray.map((roll, i) => `
+                <div class="ability">
+                    <strong>Roll ${roll.id}:</strong> ${roll.value} 
+                    (Modifier: ${roll.modifier >= 0 ? '+' : ''}${roll.modifier})
+                    <span>(Rolls: [${roll.rolls.join(', ')}], Dropped: ${roll.rolls[3]})</span>
+                </div>
+            `).join('');
         }
     </script>
 </body>
