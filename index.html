@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>D&D 5e Ability Score Generator</title>
     <style>
-        /* CSS Styles will be added here */
         body {
             font-family: "Trebuchet MS", sans-serif;
             background-color: #1e1e1e;
@@ -56,21 +55,28 @@
 
     <script>
         let rollsArray = [];
+        const ABILITIES = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
 
         function generateAbilities() {
-            const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
-            let output = '';
             rollsArray = [];
+            document.getElementById('assignments').innerHTML = '';
+            document.getElementById('abilities').innerHTML = '';
 
-            for (let i = 0; i < abilities.length; i++) {
-                let rolls = [];
-                for (let j = 0; j < 4; j++) {
-                    rolls.push(rollDie(6));
-                }
-                rolls.sort(function (a, b) { return b - a });
-                let total = rolls[0] + rolls[1] + rolls[2]; // Sum the highest three rolls
-                let modifier = Math.floor((total - 10) / 2); // Calculate the ability modifier
-                rollsArray.push(total);
+            let output = '';
+
+            for (let i = 0; i < 6; i++) {
+                let rolls = Array.from({ length: 4 }, () => rollDie(6));
+                rolls.sort((a, b) => b - a);
+                let total = rolls.slice(0, 3).reduce((sum, roll) => sum + roll, 0);
+                let modifier = Math.floor((total - 10) / 2);
+
+                // Create a roll object instead of just storing the value
+                rollsArray.push({
+                    id: i + 1,
+                    value: total,
+                    modifier: modifier,
+                    rolls: rolls
+                });
 
                 output += `<div class="ability">
                     <strong>Roll ${i + 1}:</strong> ${total} (Modifier: ${modifier >= 0 ? '+' : ''}${modifier})
@@ -79,18 +85,20 @@
             }
 
             document.getElementById('abilities').innerHTML = output;
-            generateDropdowns(abilities, rollsArray);
+            generateDropdowns();
         }
 
-        function generateDropdowns(abilities, rollsArray) {
+        function generateDropdowns() {
             let dropdowns = '';
 
-            abilities.forEach(function (ability, index) {
+            ABILITIES.forEach((ability, index) => {
                 dropdowns += `<div class="dropdown">
                     <label for="ability${index}">${ability}:</label>
-                    <select id="ability${index}" onchange="updateDropdowns()">
+                    <select id="ability${index}" onchange="updateDropdowns(this)">
                         <option value="">Select a roll</option>
-                        ${rollsArray.map((roll, i) => `<option value="${roll}">Roll ${i + 1}: ${roll}</option>`).join('')}
+                        ${rollsArray.map(roll =>
+                    `<option value="${roll.id}">Roll ${roll.id}: ${roll.value}</option>`
+                ).join('')}
                     </select>
                 </div>`;
             });
@@ -99,42 +107,47 @@
             document.getElementById('assignments').innerHTML = dropdowns;
         }
 
-        function updateDropdowns() {
-            const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
-            let selectedRolls = [];
+        function updateDropdowns(changedDropdown) {
+            let selectedValues = new Set();
 
-            abilities.forEach(function (ability, index) {
-                const selectedRoll = document.getElementById(`ability${index}`).value;
-                if (selectedRoll) {
-                    selectedRolls.push(selectedRoll);
+            // Gather all currently selected values
+            ABILITIES.forEach((_, index) => {
+                const dropdown = document.getElementById(`ability${index}`);
+                if (dropdown.value) {
+                    selectedValues.add(dropdown.value);
                 }
             });
 
-            abilities.forEach(function (ability, index) {
+            // Update all dropdowns
+            ABILITIES.forEach((_, index) => {
                 const dropdown = document.getElementById(`ability${index}`);
-                const currentSelection = dropdown.value;
-                dropdown.innerHTML = `<option value="">Select a roll</option>` +
-                    rollsArray.map((roll, i) => {
-                        if (!selectedRolls.includes(roll.toString()) || roll.toString() === currentSelection) {
-                            return `<option value="${roll}">Roll ${i + 1}: ${roll}</option>`;
-                        }
-                        return '';
-                    }).join('');
-                dropdown.value = currentSelection;
+                const currentValue = dropdown.value;
+
+                dropdown.innerHTML = `<option value="">Select a roll</option>
+                    ${rollsArray.map(roll => {
+                    if (!selectedValues.has(roll.id.toString()) || roll.id.toString() === currentValue) {
+                        return `<option value="${roll.id}" ${roll.id.toString() === currentValue ? 'selected' : ''}>
+                                Roll ${roll.id}: ${roll.value}
+                            </option>`;
+                    }
+                    return '';
+                }).join('')}`;
             });
         }
 
         function assignAbilities() {
-            const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
             let output = '';
 
-            abilities.forEach(function (ability, index) {
-                const selectedRoll = document.getElementById(`ability${index}`).value;
-                let modifier = Math.floor((selectedRoll - 10) / 2); // Calculate the ability modifier
-
-                output += `<div class="ability">
-                    <strong>${ability}:</strong> ${selectedRoll} (Modifier: ${modifier >= 0 ? '+' : ''}${modifier})
-                </div>`;
+            ABILITIES.forEach((ability, index) => {
+                const dropdown = document.getElementById(`ability${index}`);
+                const selectedId = dropdown.value;
+                if (selectedId) {
+                    const roll = rollsArray.find(r => r.id.toString() === selectedId);
+                    output += `<div class="ability">
+                        <strong>${ability}:</strong> ${roll.value} 
+                        (Modifier: ${roll.modifier >= 0 ? '+' : ''}${roll.modifier})
+                    </div>`;
+                }
             });
 
             document.getElementById('abilities').innerHTML = output;
