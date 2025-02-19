@@ -50,32 +50,31 @@
     <div id="abilities"></div>
 
     <script>
-        <script>
-            function generateAbilities() {
-        const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+        function generateAbilities() {
+            const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
             let output = '';
 
-            abilities.forEach(function(ability) {
+            abilities.forEach(function (ability) {
                 let rolls = [];
-            for (let i = 0; i < 4; i++) {
-                rolls.push(rollDie(6));
-            }
-            rolls.sort(function(a, b){return b - a});
-            let total = rolls[0] + rolls[1] + rolls[2]; // Sum the highest three rolls
+                for (let i = 0; i < 4; i++) {
+                    rolls.push(rollDie(6));
+                }
+                rolls.sort(function (a, b) { return b - a });
+                let total = rolls[0] + rolls[1] + rolls[2]; // Sum the highest three rolls
+                let modifier = Math.floor((total - 10) / 2); // Calculate the ability modifier
 
-            output += `<div class="ability">
-                <strong>${ability}:</strong> ${total}
-                <span>(Rolls: [${rolls.join(', ')}], Dropped: ${rolls[3]})</span>
-            </div>`;
-        });
-        
-        document.getElementById('abilities').innerHTML = output;
-    }
-    
-    function rollDie(sides) {
-        return Math.floor(Math.random() * sides) + 1;
-    }
-    </script>
+                output += `<div class="ability">
+                    <strong>${ability}:</strong> ${total} (Modifier: ${modifier >= 0 ? '+' : ''}${modifier})
+                    <span>(Rolls: [${rolls.join(', ')}], Dropped: ${rolls[3]})</span>
+                </div>`;
+            });
+
+            document.getElementById('abilities').innerHTML = output;
+        }
+
+        function rollDie(sides) {
+            return Math.floor(Math.random() * sides) + 1;
+        }
     </script>
 </body>
 
