@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>D&D 5e Ability Score Generator</title>
+    <style>
+        /* CSS Styles will be added here */
+        body {
+            font-family: "Trebuchet MS", sans-serif;
+            background-color: #1e1e1e;
+            color: #f5f5f5;
+            text-align: center;
+            padding: 50px;
+        }
+
+        h1 {
+            color: #ff4500;
+        }
+
+        button {
+            background-color: #ff4500;
+            color: white;
+            padding: 15px 25px;
+            font-size: 18px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #e03e00;
+        }
+
+        #abilities {
+            margin-top: 30px;
+            font-size: 20px;
+            line-height: 1.6;
+        }
+
+        .ability {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>D&D 5e Ability Score Generator</h1>
+    <button onclick="generateAbilities()">Roll Ability Scores</button>
+    <div id="abilities"></div>
+
+    <script>
+        <script>
+            function generateAbilities() {
+        const abilities = ['Strength', 'Dexterity', 'Constitution', 'Intelligence', 'Wisdom', 'Charisma'];
+            let output = '';
+
+            abilities.forEach(function(ability) {
+                let rolls = [];
+            for (let i = 0; i < 4; i++) {
+                rolls.push(rollDie(6));
+            }
+            rolls.sort(function(a, b){return b - a});
+            let total = rolls[0] + rolls[1] + rolls[2]; // Sum the highest three rolls
+
+            output += `<div class="ability">
+                <strong>${ability}:</strong> ${total}
+                <span>(Rolls: [${rolls.join(', ')}], Dropped: ${rolls[3]})</span>
+            </div>`;
+        });
+        
+        document.getElementById('abilities').innerHTML = output;
+    }
+    
+    function rollDie(sides) {
+        return Math.floor(Math.random() * sides) + 1;
+    }
+    </script>
+    </script>
+</body>
+
+</html>
